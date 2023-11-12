@@ -44,7 +44,11 @@ const DataForm = forwardRef((_, ref) => {
     }, [objectType])
 
     useEffect(()=>{
-        ref.current = inputs;
+        ref.current = [...inputs, {
+            key: 'object_type',
+            type: 'string',
+            value: objectType
+        }];
     }, [inputs, ref]);
 
     return (<div className={'flex flex-col gap-4'}>

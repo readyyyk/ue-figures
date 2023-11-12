@@ -9,12 +9,18 @@ const prepareData = (data, dots) => {
         return false;
     }
     const res = {};
+    console.log(data)
     for(let el of data) {
         if (el.key === 'shape') {
-            res[el.key] = dots;
+            res[el.key] = dots.map((el)=> {
+                const m = 50;
+                return {
+                    x: (el.x - 125) / m,
+                    y: (el.y - 125) / m
+            }});
             continue;
         }
-        if (el.value==='') {
+        if (el.value.trim() === '') {
             alert('All fields must be filled!');
             return false;
         }
@@ -27,6 +33,12 @@ const App = () => {
     const data = useRef(null);
     const handleGetData = () => {
         console.log(prepareData(data.current, JSON.parse(localStorage.dots)));
+        fetch(
+            'http://localhost:16800/save_flat', {
+                method: "POST",
+                body: prepareData(data.current, JSON.parse(localStorage.dots))
+            }
+        )
     }
 
     return (
