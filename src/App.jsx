@@ -3,10 +3,10 @@ import {useRef} from 'react';
 import {Button} from '@mui/material';
 
 
-const adjustDot = ({x, y}, adjustC) => {
+const adjustDot = ({x, y}, canvasSize, adjustC) => {
     return {
-        x: (x - 125) / adjustC,
-        y: (y - 125) / adjustC,
+        x: (x - canvasSize/2) / adjustC,
+        y: (y - canvasSize/2) / adjustC,
     }
 }
 
@@ -18,7 +18,11 @@ const prepareData = (data, dots) => {
     const res = {};
     for(let el of data) {
         if (el.key === 'shape') {
-            res['shape'] = dots.map((el) => adjustDot(el, Number(import.meta.VITE_ADJUST_SIZE_K)));
+            res['shape'] = dots.map((el) => adjustDot(
+                el,
+                Number(import.meta.VITE_CANVAS_SIZE),
+                Number(import.meta.VITE_ADJUST_SIZE_K),
+            ));
             continue;
         }
         if (el.value.trim() === '') {
@@ -44,7 +48,7 @@ const App = () => {
             <div className={'mx-auto mt-2 w-fit max-w-[94dvw] rounded-xl px-6 py-8 shadow-xl'}>
                 <div className={'flex flex-col items-center space-x-0 space-y-8 md:flex-row md:space-x-12 md:space-y-0'}>
                     <DataForm ref={data}/>
-                    <canvas id={'cvs'} className={'border-4'} width={250} height={250}></canvas>
+                    <canvas id={'cvs'} className={'border-4'} width={Number(import.meta.VITE_CANVAS_SIZE)} height={Number(import.meta.VITE_CANVAS_SIZE)}></canvas>
                 </div>
                 <div className={'col-span-2 mt-12 flex justify-center'}>
                     <Button size={'large'} color={'success'} variant={'contained'} onClick={handleGetData} id={'create'}>Create object</Button>
