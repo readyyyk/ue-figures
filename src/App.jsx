@@ -3,28 +3,29 @@ import {useRef} from 'react';
 import {Button} from '@mui/material';
 
 
+const adjustDot = ({x, y}, adjustC) => {
+    return {
+        x: (x - 125) / adjustC,
+        y: (y - 125) / adjustC,
+    }
+}
+
 const prepareData = (data, dots) => {
-    if (dots.length < 3) {
+    if (dots.length < Number(import.meta.VITE_MIN_DOTS)) {
         alert('Provide at least 3 points for shape!')
-        return false;
+        return null;
     }
     const res = {};
-    console.log(data)
     for(let el of data) {
         if (el.key === 'shape') {
-            res[el.key] = dots.map((el)=> {
-                const m = 50;
-                return {
-                    x: (el.x - 125) / m,
-                    y: (el.y - 125) / m
-            }});
+            res['shape'] = dots.map((el) => adjustDot(el, Number(import.meta.VITE_ADJUST_SIZE_K)));
             continue;
         }
         if (el.value.trim() === '') {
             alert('All fields must be filled!');
-            return false;
+            return null;
         }
-        res[el.key] = el.value;
+        res[el.key] = el.value.trim();
     }
     return JSON.stringify(res);
 }
@@ -32,13 +33,9 @@ const prepareData = (data, dots) => {
 const App = () => {
     const data = useRef(null);
     const handleGetData = () => {
-        console.log(prepareData(data.current, JSON.parse(localStorage.dots)));
-        fetch(
-            'http://localhost:16800/save_flat', {
-                method: "POST",
-                body: prepareData(data.current, JSON.parse(localStorage.dots))
-            }
-        )
+        const dataJSON = prepareData(data.current, JSON.parse(localStorage.dots));
+        console.log(dataJSON);
+        fetch(import.meta.VITE_SEND_DATA_URL, {method: 'POST', body: dataJSON});
     }
 
     return (
